@@ -7,6 +7,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use JWTAuth;
 class UserController extends Controller
@@ -52,7 +53,7 @@ class UserController extends Controller
         }
         else{
             $user = User::create([
-                'name'=>'Test User',
+                'name'=>Str::ucfirst(Str::before($request->email,'@')),
                 'email'=>$request->email,
                 'password'=>Hash::make($request->password)
             ]);
