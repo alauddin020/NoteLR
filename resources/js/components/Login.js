@@ -89,7 +89,8 @@ export default class LogIn extends React.Component{
                 localStorage.removeItem('notes');
                 localStorage.setItem('tokenId',response.data.message)
                 localStorage.setItem('user',response.data.name)
-                window.location.reload();
+                // window.location.reload();
+                window.location.assign('/user');
             }
         }).catch(error=> {
             if (error.error==='ok')
@@ -114,7 +115,7 @@ export default class LogIn extends React.Component{
                                     <div className="form-group row">
                                         <label htmlFor="email" className="col-md-4 col-form-label text-md-right">Email</label>
                                         <div className="col-md-6">
-                                            <input id="email"  onChange={this.handelOnChange.bind(this)} type="email" className={formErrors.email.length > 0 ? "form-control is-invalid error" : 'form-control'} name="email"  required autoComplete="email" autoFocus />
+                                            <input id="email" placeholder={'Enter Email Address'}  onChange={this.handelOnChange.bind(this)} type="email" className={formErrors.email.length > 0 ? "form-control is-invalid error" : 'form-control'} name="email"  required autoComplete="email" autoFocus />
                                         </div>
                                         {formErrors.email.length > 0 && (
                                             <span className="errorMessage">{formErrors.email}</span>
@@ -125,7 +126,7 @@ export default class LogIn extends React.Component{
                                         <label htmlFor="password" className="col-md-4 col-form-label text-md-right">Password</label>
 
                                         <div className="col-md-6">
-                                            <input  id="password"  name="password" onChange={this.handelOnChange.bind(this)} type="password" className={formErrors.password.length > 0 ? "form-control is-invalid error" : 'form-control'}  />
+                                            <input placeholder={'Password'}  id="password"  name="password" onChange={this.handelOnChange.bind(this)} type="password" className={formErrors.password.length > 0 ? "form-control is-invalid error" : 'form-control'}  />
                                         </div>
                                         {formErrors.password.length > 0 && (
                                             <span className="errorMessage">{formErrors.password}</span>

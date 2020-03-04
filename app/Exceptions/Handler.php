@@ -3,7 +3,10 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -50,6 +53,30 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if($exception instanceof AuthenticationException )
+        {
+
+            return response()->json([
+                'error'=>'unauthorized',
+                'message'   =>'invalid Token'
+            ],401);
+
+        }
+        else if ($exception instanceof NotFoundHttpException) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'error'=>'Not Found',
+                    'message'   =>'url not found'
+                ],404);
+            }
+        }
+        else if ($exception instanceof MethodNotAllowedHttpException) {
+            return response()->json([
+                'error'=>'Method Not Allowed',
+                'message'   =>'Method Not Allowed'
+            ],401);
+
+        }
         return parent::render($request, $exception);
     }
 }

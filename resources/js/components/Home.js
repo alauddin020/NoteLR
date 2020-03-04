@@ -16,6 +16,13 @@ export default class Home extends React.Component{
                 this.setState({
                     notes: response.data.note
                 });
+            }).catch(function (error) {
+                if(error.response.status===401)
+                {
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('tokenId');
+                    window.location.assign('/login');
+                }
             })
         }
         else
@@ -93,17 +100,26 @@ export default class Home extends React.Component{
             localStorage.setItem('notes',JSON.stringify(notes));
         }
     }
+    handleKeyDown(e) {
+        e.target.style.height = 'inherit';
+        e.target.style.height = `${e.target.scrollHeight}px`;
+    }
     render() {
+        const style = {
+            overflowY: 'hidden',
+            resize:'none',
+            boxSizing:'border-box',
+            fontSize:'15px'};
             return (
                 <div className="container mb-5">
                     <div className="row justify-content-center">
                         <div className="col-md-8">
                             <div className="card">
-                                <div className="card-header">Add New Note</div>
+                                <div className="card-header"><strong>Add New Note</strong></div>
                                 <div className="card-body">
                                     <div className="form-group">
                                         <label htmlFor="formGroupExampleInput">Write Note</label>
-                                        <textarea value={this.state.note} onChange={this.handleChange.bind(this)}  className="form-control" placeholder="Write Something" name={'note'} id="formGroupExampleInput" />
+                                        <textarea style={style} onKeyUp={this.handleKeyDown} value={this.state.note} onChange={this.handleChange.bind(this)}  className="form-control" placeholder="Write Something" name={'note'} id="formGroupExampleInput" />
                                     </div>
                                     <div className="form-group">
                                         <button onClick={this.addNote.bind(this)} type="button" className="btn btn-success">Save Note</button>

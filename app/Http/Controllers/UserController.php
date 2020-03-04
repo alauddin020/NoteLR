@@ -6,6 +6,7 @@ use App\Note;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use JWTAuth;
 class UserController extends Controller
@@ -14,11 +15,11 @@ class UserController extends Controller
     public function login(Request $request)
     {
 //        return response()->json(['data'=>$request->notes]);
+        $input = $request->only('email', 'password');
         $user = User::where('email',$request->email)->first();
         $token = null;
         if ($user)
         {
-            $input = $request->only('email', 'password');
             if(!$token = JWTAuth::attempt($input))
             {
                 return response()->json([
@@ -50,10 +51,21 @@ class UserController extends Controller
             }
         }
         else{
-            return response()->json([
-                'error' => 'ok',
-                'message' => 'Email Not Found',
+            $user = User::create([
+                'name'=>'Test User',
+                'email'=>$request->email,
+                'password'=>Hash::make($request->password)
             ]);
+            $token = JWTAuth::attempt($input);
+            return response()->json([
+                'success' => 'ok',
+                'message' => $token,
+                'name' => $user->name,
+            ]);
+//            return response()->json([
+//                'error' => 'ok',
+//                'message' => 'Email Not Found',
+//            ]);
         }
     }
     public function logout(Request $request)

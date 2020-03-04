@@ -15,7 +15,7 @@ class NoteController extends Controller
      */
     public function index()
     {
-        return response()->json(['note'=>Note::all()]);
+        return response()->json(['note'=>Note::with('user')->where('user_id',Auth::id())->get()]);
     }
 
     /**
@@ -75,9 +75,11 @@ class NoteController extends Controller
      * @param  \App\Note  $note
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Note $note)
+    public function update(Request $request, $id)
     {
-        //
+        $note = Note::find($id);
+        $note->note = $request->note;
+        $note->save();
     }
 
 

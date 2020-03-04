@@ -16,6 +16,13 @@ export default class Profile extends React.Component{
             this.setState({
                 user: response.data
             })
+        }).catch(function (error) {
+            if(error.response.status===401)
+            {
+                localStorage.removeItem('user');
+                localStorage.removeItem('tokenId');
+                window.location.assign('/login');
+            }
         });
     }
 
@@ -27,7 +34,7 @@ export default class Profile extends React.Component{
                         <div className="card">
                             <div className="card-header"><h4 className={'card-title'}>{this.state.user.name}</h4></div>
                             <div className="card-body">
-                               <strong> {this.state.user.email}</strong>
+                               <strong> {this.state.user.email}</strong><br/>
                                 {(this.state.user.note && this.state.user.note.length) ?
                                     this.state.user.note.map((note,key)=>{
                                        return(

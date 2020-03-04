@@ -69976,6 +69976,12 @@ var Home = /*#__PURE__*/function (_React$Component) {
           _this2.setState({
             notes: response.data.note
           });
+        })["catch"](function (error) {
+          if (error.response.status === 401) {
+            localStorage.removeItem('user');
+            localStorage.removeItem('tokenId');
+            window.location.assign('/login');
+          }
         });
       } else {
         var allNote = JSON.parse(localStorage.getItem('notes'));
@@ -70061,10 +70067,22 @@ var Home = /*#__PURE__*/function (_React$Component) {
       }
     }
   }, {
+    key: "handleKeyDown",
+    value: function handleKeyDown(e) {
+      e.target.style.height = 'inherit';
+      e.target.style.height = "".concat(e.target.scrollHeight, "px");
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this5 = this;
 
+      var style = {
+        overflowY: 'hidden',
+        resize: 'none',
+        boxSizing: 'border-box',
+        fontSize: '15px'
+      };
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container mb-5"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -70075,13 +70093,15 @@ var Home = /*#__PURE__*/function (_React$Component) {
         className: "card"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-header"
-      }, "Add New Note"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, "Add New Note")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-body"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
         htmlFor: "formGroupExampleInput"
       }, "Write Note"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("textarea", {
+        style: style,
+        onKeyUp: this.handleKeyDown,
         value: this.state.note,
         onChange: this.handleChange.bind(this),
         className: "form-control",
@@ -70283,8 +70303,9 @@ var LogIn = /*#__PURE__*/function (_React$Component) {
 
           localStorage.removeItem('notes');
           localStorage.setItem('tokenId', response.data.message);
-          localStorage.setItem('user', response.data.name);
-          window.location.reload();
+          localStorage.setItem('user', response.data.name); // window.location.reload();
+
+          window.location.assign('/user');
         }
       })["catch"](function (error) {
         if (error.error === 'ok') {
@@ -70321,6 +70342,7 @@ var LogIn = /*#__PURE__*/function (_React$Component) {
         className: "col-md-6"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         id: "email",
+        placeholder: 'Enter Email Address',
         onChange: this.handelOnChange.bind(this),
         type: "email",
         className: formErrors.email.length > 0 ? "form-control is-invalid error" : 'form-control',
@@ -70338,6 +70360,7 @@ var LogIn = /*#__PURE__*/function (_React$Component) {
       }, "Password"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        placeholder: 'Password',
         id: "password",
         name: "password",
         onChange: this.handelOnChange.bind(this),
@@ -70511,8 +70534,8 @@ var Note = /*#__PURE__*/function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Note).call(this, props));
     _this.state = {
-      note: {},
       name: '',
+      notes: '',
       id: _this.props.match.params.id
     };
     return _this;
@@ -70535,11 +70558,17 @@ var Note = /*#__PURE__*/function (_React$Component) {
       }).then(function (response) {
         if (response.data.message === 'ok') {
           _this2.setState({
-            note: response.data.data,
+            notes: response.data.data.note,
             name: response.data.data.user.name
           });
         } else {
           _this2.props.history.push('/404');
+        }
+      })["catch"](function (error) {
+        if (error.response.status === 401) {
+          localStorage.removeItem('user');
+          localStorage.removeItem('tokenId');
+          window.location.assign('/login');
         }
       });
     }
@@ -70550,10 +70579,46 @@ var Note = /*#__PURE__*/function (_React$Component) {
     }
   }, {
     key: "addNote",
-    value: function addNote() {}
+    value: function addNote() {
+      var _this3 = this;
+
+      var note = this.state.notes; // localStorage.removeItem('notes');
+
+      if (note !== '') {
+        var data = {
+          note: note
+        };
+        var token = localStorage.getItem('tokenId');
+        axios__WEBPACK_IMPORTED_MODULE_1___default.a.put('/api/note/' + this.state.id, data, {
+          headers: {
+            "Authorization": "Bearer ".concat(token)
+          }
+        }).then(function (response) {
+          _this3.setState({
+            note: ''
+          });
+
+          _this3.props.history.push('/');
+        });
+      } else {
+        alert('write something');
+      }
+    }
+  }, {
+    key: "handleKeyDown",
+    value: function handleKeyDown(e) {
+      e.target.style.height = 'inherit';
+      e.target.style.height = "".concat(e.target.scrollHeight, "px");
+    }
   }, {
     key: "render",
     value: function render() {
+      var style = {
+        overflowY: 'hidden',
+        resize: 'none',
+        boxSizing: 'border-box',
+        fontSize: '15px'
+      };
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: 'container'
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -70567,11 +70632,13 @@ var Note = /*#__PURE__*/function (_React$Component) {
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
         htmlFor: "formGroupExampleInput"
       }, "Update Note"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("textarea", {
-        value: this.state.note.note,
+        style: style,
+        onKeyUp: this.handleKeyDown,
+        value: this.state.notes,
         onChange: this.handleChange.bind(this),
         className: "form-control",
         placeholder: "Write Something",
-        name: 'note',
+        name: 'notes',
         id: "formGroupExampleInput"
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
@@ -70658,6 +70725,12 @@ var Profile = /*#__PURE__*/function (_React$Component) {
         _this2.setState({
           user: response.data
         });
+      })["catch"](function (error) {
+        if (error.response.status === 401) {
+          localStorage.removeItem('user');
+          localStorage.removeItem('tokenId');
+          window.location.assign('/login');
+        }
       });
     }
   }, {
@@ -70677,7 +70750,7 @@ var Profile = /*#__PURE__*/function (_React$Component) {
         className: 'card-title'
       }, this.state.user.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-body"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, " ", this.state.user.email), this.state.user.note && this.state.user.note.length ? this.state.user.note.map(function (note, key) {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, " ", this.state.user.email), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), this.state.user.note && this.state.user.note.length ? this.state.user.note.map(function (note, key) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           key: key,
           className: 'card mt-1 mb-1'
