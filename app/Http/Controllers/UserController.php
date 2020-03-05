@@ -9,13 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use JWTAuth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 class UserController extends Controller
 {
-
+    //TODO:: User Authentication
     public function login(Request $request)
     {
-//        return response()->json(['data'=>$request->notes]);
         $input = $request->only('email', 'password');
         $user = User::where('email',$request->email)->first();
         $token = null;
@@ -30,20 +29,8 @@ class UserController extends Controller
             }
             else
             {
-                //$accessToken = $user->createToken('authToken')->accessToken;
-                if ($request->has('notes'))
-                {
-                    if($request->notes)
-                    {
-                        foreach ($request->notes as $note)
-                        {
-                            Note::create([
-                                'note'=>$note,
-                                'user_id'=>$user->id
-                            ]);
-                        }
-                    }
-                }
+                //TODO:: if User Store local Storage save any data then into database
+                $this->note($request,$user);
                 return response()->json([
                     'success' => 'ok',
                     'message' => $token,
@@ -52,28 +39,45 @@ class UserController extends Controller
             }
         }
         else{
+            //TODO:: Email Not Found Then Create New Account
             $user = User::create([
                 'name'=>Str::ucfirst(Str::before($request->email,'@')),
                 'email'=>$request->email,
                 'password'=>Hash::make($request->password)
             ]);
+            //TODO:: if User Store local Storage save any data then into database
+            $this->note($request,$user);
             $token = JWTAuth::attempt($input);
             return response()->json([
                 'success' => 'ok',
                 'message' => $token,
                 'name' => $user->name,
             ]);
-//            return response()->json([
-//                'error' => 'ok',
-//                'message' => 'Email Not Found',
-//            ]);
         }
     }
+    //TODO:: LocalStorage Data Save
+    protected function note($request,$user)
+    {
+        if ($request->has('notes'))
+        {
+            if($request->notes)
+            {
+                try {
+                    foreach ($request->notes as $note)
+                    {
+                        Note::create([
+                            'note'=>$note,
+                            'user_id'=>$user->id
+                        ]);
+                    }
+                }
+                catch (\Exception $e){}
+            }
+        }
+    }
+    //TODO:: Logout Method
     public function logout(Request $request)
     {
-//        $a =Auth::user()->token()->revoke();
-//        Auth::user()->token()->delete();
-//        return response()->json(['message'=>$a]);
         try {
             JWTAuth::invalidate($request->token);
 
@@ -88,53 +92,9 @@ class UserController extends Controller
             ], 500);
         }
     }
+    //TODO:: User Details with Notes
     public function loginUser()
     {
         return User::with('note')->findOrFail(Auth::id());
-//       return $id = JWTAuth::parseToken()->authenticate();
-    }
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

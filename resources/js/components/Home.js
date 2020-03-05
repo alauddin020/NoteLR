@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from "axios";
 import {Link} from "react-router-dom";
+import WriteNote from "./WriteNote";
+import EditDelete from "./EditDelete";
 export default class Home extends React.Component{
     constructor(props) {
         super(props);
@@ -100,50 +102,22 @@ export default class Home extends React.Component{
             localStorage.setItem('notes',JSON.stringify(notes));
         }
     }
-    handleKeyDown(e) {
-        e.target.style.height = 'inherit';
-        e.target.style.height = `${e.target.scrollHeight}px`;
-    }
     render() {
-        const style = {
-            overflowY: 'hidden',
-            resize:'none',
-            boxSizing:'border-box',
-            fontSize:'15px'};
             return (
                 <div className="container mb-5">
                     <div className="row justify-content-center">
                         <div className="col-md-8">
-                            <div className="card">
-                                <div className="card-header"><strong>Add New Note</strong></div>
-                                <div className="card-body">
-                                    <div className="form-group">
-                                        <label htmlFor="formGroupExampleInput">Write Note</label>
-                                        <textarea style={style} onKeyUp={this.handleKeyDown} value={this.state.note} onChange={this.handleChange.bind(this)}  className="form-control" placeholder="Write Something" name={'note'} id="formGroupExampleInput" />
-                                    </div>
-                                    <div className="form-group">
-                                        <button onClick={this.addNote.bind(this)} type="button" className="btn btn-success">Save Note</button>
-                                    </div>
-                                </div>
-                            </div>
-                            {(this.state.notes && this.state.notes.length) ? this.state.notes.map((note,key)=>{
-                                return(
-                                    <div className={'card mt-2'}  key={key}>
-                                        <div className={'card-body'}>
-                                            <div className={'row'}>
-                                                <div className={'col-md-9'}>
-                                                    {localStorage.getItem('user') !==null ? note.note : note}
-                                                </div>
-                                                <div className={'col-md-3 pull-right'}>
-                                                    {localStorage.getItem('user') !==null ? <Link className="btn btn-info mr-2" role="button" to={'note/'+note.id+'/edit'}>Edit</Link> :''}
-                                                    <input type={'button'} className={'btn btn-danger'} value={'X'} data-key={localStorage.getItem('user') !==null ?note.id : key} onClick={this.delete.bind(this)} />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-
-                            }) :
+                            <WriteNote
+                                name={'Add New Note'}
+                                label={'Write Note'}
+                                note={this.state.note}
+                                onchange={this.handleChange.bind(this)}
+                                addNote={this.addNote.bind(this)}
+                                inputName={'note'}
+                                btn={'Save Note'}
+                            />
+                            {(this.state.notes && this.state.notes.length) ?
+                                <EditDelete notes={this.state.notes} delete={this.delete.bind(this)} /> :
                                 <div className={'card mt-2'}>
                                     <div className={'card-body'}>
                                         <strong>No Data Found</strong>

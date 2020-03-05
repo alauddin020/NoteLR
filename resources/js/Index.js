@@ -5,7 +5,6 @@ import Login from "./components/Login";
 import Note from "./components/Note";
 import ReactDOM from 'react-dom';
 import {BrowserRouter as Router,Route,Link,Switch } from "react-router-dom";
-import axios from "axios";
 import Logout from "./components/Logout";
 import E404 from "./components/E404";
 export default class Index extends React.Component {
@@ -47,7 +46,6 @@ export default class Index extends React.Component {
                             <Route  path="/logout" exact component={Logout}  />
                             <Route  path="/note/:id/edit" exact component={Note}  />
                             <Route  path="/*" exact component={E404} />
-                            <Route  path="/404" exact component={E404} />
                         </Switch>
                     </div>
                 </Router>

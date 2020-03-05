@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from "axios";
+import E404 from "./E404";
+import WriteNote from "./WriteNote";
 export default class Note extends React.Component{
     constructor(props) {
         super(props);
@@ -7,6 +9,7 @@ export default class Note extends React.Component{
             name: '',
             notes: '',
             id: this.props.match.params.id,
+            notFound: false,
         }
     }
     componentDidMount()
@@ -25,7 +28,10 @@ export default class Note extends React.Component{
             }
             else
             {
-                this.props.history.push('/404');
+                //this.props.history.push('/404');
+                this.setState({
+                    notFound: true
+                })
             }
         }).catch(function (error) {
             if(error.response.status===401)
@@ -70,20 +76,23 @@ export default class Note extends React.Component{
             resize:'none',
             boxSizing:'border-box',
             fontSize:'15px'};
+        if (this.state.notFound)
+        {
+            return (
+              <E404 />
+            );
+        }
         return (
             <div className={'container'}>
-                <div className={'card'}>
-                    <div className={'card-header'}><strong>{this.state.name}</strong></div>
-                    <div className="card-body">
-                        <div className="form-group">
-                            <label htmlFor="formGroupExampleInput">Update Note</label>
-                            <textarea style={style} onKeyUp={this.handleKeyDown} value={this.state.notes} onChange={this.handleChange.bind(this)}  className="form-control" placeholder="Write Something" name={'notes'} id="formGroupExampleInput" />
-                        </div>
-                        <div className="form-group">
-                            <button onClick={this.addNote.bind(this)} type="button" className="btn btn-success">Update Note</button>
-                        </div>
-                    </div>
-                </div>
+                <WriteNote
+                    name={this.state.name}
+                    label={'Update Note'}
+                    note={this.state.notes}
+                    onchange={this.handleChange.bind(this)}
+                    addNote={this.addNote.bind(this)}
+                    inputName={'notes'}
+                    btn={'Update Note'}
+                />
             </div>
         )
     }

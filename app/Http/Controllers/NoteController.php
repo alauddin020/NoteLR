@@ -8,32 +8,13 @@ use Illuminate\Support\Facades\Auth;
 
 class NoteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @param Note
-     * @return \Illuminate\Http\JsonResponse
-     */
+    //TODO:: Show User all Notes
     public function index()
     {
         return response()->json(['note'=>Note::with('user')->where('user_id',Auth::id())->get()]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    //TODO:: Create New Note and Data Store into Database
     public function store(Request $request)
     {
         Note::create([
@@ -41,48 +22,24 @@ class NoteController extends Controller
             'user_id'=>Auth::id()
         ]);
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Note  $note
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Note $note)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Note  $note
-     * @return \Illuminate\Http\JsonResponse
-     */
+    //TODO:: Edit User Note
     public function edit($id)
     {
-        $note = Note::with('user')->find($id);
+        $note = Note::with('user')->where('user_id',Auth::id())->find($id);
         if ($note)
         {
             return response()->json(['message'=>'ok','data'=>$note]);
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Note  $note
-     * @return \Illuminate\Http\Response
-     */
+    //TODO:: Update User Note
     public function update(Request $request, $id)
     {
         $note = Note::find($id);
         $note->note = $request->note;
         $note->save();
     }
-
-
+    //TODO:: Delete User Note
     public function destroy($note)
     {
         Note::destroy($note);
